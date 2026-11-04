@@ -1,0 +1,20 @@
+{
+  "name": "freshflow",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "seed:users": "node --env-file=.env.local scripts/seed-users.mjs"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "jose": "^5.9.6",
+    "mongodb": "^6.10.0",
+    "mysql2": "^3.11.4",
+    "next": "^15.0.3",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  }
+}
