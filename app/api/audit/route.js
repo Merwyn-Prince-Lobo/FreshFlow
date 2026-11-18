@@ -1,0 +1,4 @@
+import { requireRole } from '@/lib/auth';
+import { query } from '@/lib/db';
+import { mongo } from '@/lib/mongo';
+export async function GET(){const {error}=await requireRole(['Admin']);if(error)return error;try{const db=await mongo();const logs=await db.collection('audit_logs').find({}).sort({at:-1}).limit(500).toArray();const ids=[...new Set(logs.map(l=>Number(l.userId)).filter(Number.isFinite))];const users=ids.length?await query(`SELECT User_ID,Name FROM APP_USER WHERE User_ID IN (${ids.map(()=>'?').join(',')})`,ids):[];const map=new Map(users.map(u=>[Number(u.User_ID),u.Name]));return Response.json(logs.map(l=>({...l,_id:String(l._id),userName:map.get(Number(l.userId))||`User ${l.userId}`})))}catch(e){console.error('Audit GET',e);return Response.json({error:'Unable to load audit trail. Check MongoDB connection.'},{status:500})}}

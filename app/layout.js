@@ -1,11 +1,14 @@
-export const metadata = { title: 'FreshFlow' };
+import './globals.css';
+
+export const metadata = {
+  title: 'FreshFlow | Smart Inventory',
+  description: 'Smart perishable inventory management',
+};
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body style={{ margin: 0, fontFamily: 'system-ui, sans-serif', background: '#f6f7f4', color: '#1d2a22' }}>
-        {children}
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

@@ -1,0 +1,7 @@
+import { requireRole } from '@/lib/auth';
+import { query } from '@/lib/db';
+export async function GET(){const {error}=await requireRole(['Admin']);if(error)return error;try{const [summary,monthly,reasons,locations]=await Promise.all([
+ query('SELECT Product_Name,Supplier_Name,Reason,Location_Name,Month,Qty_Wasted,Cost_Wasted FROM v_waste_summary ORDER BY Month DESC,Cost_Wasted DESC'),
+ query('SELECT DATE_FORMAT(m.Moved_At,\'%Y-%m\') AS Month,SUM(m.Quantity*i.Unit_Cost) AS Cost_Wasted,SUM(m.Quantity) AS Qty_Wasted FROM WASTE w JOIN STOCK_MOVEMENT m ON m.Movement_ID=w.Movement_ID JOIN INVENTORY i ON i.Inventory_ID=w.Inventory_ID GROUP BY DATE_FORMAT(m.Moved_At,\'%Y-%m\') ORDER BY Month ASC'),
+ query('SELECT w.Reason,SUM(m.Quantity) AS Qty_Wasted,SUM(m.Quantity*i.Unit_Cost) AS Cost_Wasted FROM WASTE w JOIN STOCK_MOVEMENT m ON m.Movement_ID=w.Movement_ID JOIN INVENTORY i ON i.Inventory_ID=w.Inventory_ID GROUP BY w.Reason ORDER BY Cost_Wasted DESC'),
+ query('SELECT l.Location_Name,SUM(m.Quantity) AS Qty_Wasted,SUM(m.Quantity*i.Unit_Cost) AS Cost_Wasted FROM WASTE w JOIN STOCK_MOVEMENT m ON m.Movement_ID=w.Movement_ID JOIN INVENTORY i ON i.Inventory_ID=w.Inventory_ID JOIN LOCATION l ON l.Location_ID=i.Location_ID GROUP BY l.Location_Name ORDER BY Cost_Wasted DESC')]);return Response.json({summary,monthly,reasons,locations})}catch(e){console.error('Analytics GET',e);return Response.json({error:'Unable to load waste analytics.'},{status:500})}}
